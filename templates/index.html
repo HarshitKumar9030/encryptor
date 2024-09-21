@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Vault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      @keyframes wave {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+      .animate-wave {
+        animation: wave 1s infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-orange-50 min-h-screen">
+    <div class="container mx-auto p-6 md:p-8 lg:p-12">
+      <h1 class="text-4xl font-bold mb-12 text-center text-orange-800">
+        Secure Vault
+      </h1>
+
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
+        <h2 class="text-2xl font-semibold mb-8 text-orange-700">
+          Add Secret
+        </h2>
+        <form id="encryptTextForm" class="space-y-8">
+          <div>
+            <label
+              for="title"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            />
+          </div>
+          <div>
+            <label
+              for="password"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Password</label
+            >
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            />
+          </div>
+          <div>
+            <label
+              for="plaintext"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Secret Text</label
+            >
+            <textarea
+              id="plaintext"
+              name="plaintext"
+              rows="4"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 transform"
+          >
+            Encrypt and Save
+          </button>
+        </form>
+      </div>
+
+      <!-- Encrypt File Section -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
+        <h2 class="text-2xl font-semibold mb-8 text-orange-700">
+          Encrypt File
+        </h2>
+        <form
+          id="encryptFileForm"
+          enctype="multipart/form-data"
+          class="space-y-8"
+        >
+          <div>
+            <label
+              for="fileTitle"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >File Title</label
+            >
+            <input
+              type="text"
+              id="fileTitle"
+              name="fileTitle"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            />
+          </div>
+          <div>
+            <label
+              for="secretSelector"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Select Secret</label
+            >
+            <select
+              id="secretSelector"
+              name="secretSelector"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            >
+              <option value="">Select a secret</option>
+            </select>
+          </div>
+          <div>
+            <label
+              for="file"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >File to Encrypt</label
+            >
+            <input
+              type="file"
+              id="file"
+              name="file"
+              required
+              class="w-full text-orange-700 file:mr-4 file:py-3 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200 transition duration-300"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 transform"
+          >
+            Encrypt and Download File
+          </button>
+        </form>
+      </div>
+
+      <!-- Decrypt File Section -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
+        <h2 class="text-2xl font-semibold mb-8 text-orange-700">
+          Decrypt File
+        </h2>
+        <form
+          id="decryptFileForm"
+          enctype="multipart/form-data"
+          class="space-y-8"
+        >
+          <div>
+            <label
+              for="encryptedFile"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Encrypted File</label
+            >
+            <input
+              type="file"
+              id="encryptedFile"
+              name="encryptedFile"
+              required
+              class="w-full text-orange-700 file:mr-4 file:py-3 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-orange-100 file:text-orange-700 hover:file:bg-orange-200 transition duration-300"
+            />
+          </div>
+          <div>
+            <label
+              for="decryptPassword"
+              class="block text-sm font-medium text-orange-700 mb-2"
+              >Password</label
+            >
+            <input
+              type="password"
+              id="decryptPassword"
+              name="decryptPassword"
+              required
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 transform"
+          >
+            Decrypt and Download File
+          </button>
+        </form>
+      </div>
+
+      <!-- Secrets List -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
+        <h2 class="text-2xl font-semibold mb-8 text-orange-700">
+          Your Secrets
+        </h2>
+        <div id="secretsList" class="space-y-4"></div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="bg-orange-800 text-white py-8 mt-12 rounded-lg">
+        <div
+          class="container mx-auto px-6 md:px-8 lg:px-12 flex flex-col md:flex-row justify-between items-center"
+        >
+          <div class="mb-4 md:mb-0">
+            <p>&copy; 2023 Secure Vault. All rights reserved.</p>
+          </div>
+          <div>
+            <p>
+              Created by
+              <a
+                href="https://leoncyriac.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-semibold hover:text-orange-300 transition duration-300 animate-wave inline-block"
+              >
+                Harshit
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      async function loadSecrets() {
+        try {
+          const response = await axios.get("/secrets");
+          const secretsList = document.getElementById("secretsList");
+          const secretSelector = document.getElementById("secretSelector");
+
+          secretsList.innerHTML = "";
+          secretSelector.innerHTML =
+            "<option value=''>Select a secret</option>";
+
+          if (response.data.length === 0) {
+            secretSelector.innerHTML =
+              "<option value=''>No secrets available. Add a secret first.</option>";
+            secretsList.innerHTML =
+              "<p class='text-orange-600'>No secrets available. Add a secret to get started.</p>";
+          } else {
+            response.data.forEach((secret) => {
+              const secretElement = document.createElement("div");
+              secretElement.className =
+                "flex justify-between items-center bg-orange-100 p-6 rounded-md transition duration-300 hover:bg-orange-200";
+              secretElement.innerHTML = `
+                            <span class="font-medium text-orange-800">${
+                              secret.title
+                            } ${secret.is_file ? "(File)" : "(Text)"}</span>
+                            <button onclick="decryptSecret(${secret.id}, '${
+                secret.title
+              }')" class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 transform hover:scale-105">Decrypt</button>
+                        `;
+              secretsList.appendChild(secretElement);
+
+              const option = document.createElement("option");
+              option.value = secret.id;
+              option.textContent = secret.title;
+              secretSelector.appendChild(option);
+            });
+          }
+        } catch (error) {
+          console.error("Failed to load secrets:", error);
+        }
+      }
+
+      document
+        .getElementById("encryptTextForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          try {
+            const response = await axios.post("/encrypt", formData);
+            alert(response.data.message);
+            loadSecrets();
+            this.reset();
+          } catch (error) {
+            alert("Encryption failed. Please try again.");
+          }
+        });
+
+      document
+        .getElementById("encryptFileForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          try {
+            const response = await axios.post("/encrypt-file", formData, {
+              responseType: "blob",
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "encrypted_file");
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            alert("File encrypted and downloaded successfully");
+            this.reset();
+          } catch (error) {
+            alert("File encryption failed. Please try again.");
+          }
+        });
+
+      document
+        .getElementById("decryptFileForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+          try {
+            const response = await axios.post("/decrypt-file", formData, {
+              responseType: "blob",
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "decrypted_file");
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+            alert("File decrypted and downloaded successfully");
+            this.reset();
+          } catch (error) {
+            alert("File decryption failed. Please try again.");
+          }
+        });
+
+      async function decryptSecret(id, title) {
+        const password = prompt(`Enter password for "${title}"`);
+        if (password) {
+          try {
+            const response = await axios.post("/decrypt", { id, password });
+            alert(`Decrypted content: ${response.data.decrypted_content}`);
+          } catch (error) {
+            alert(
+              "Decryption failed. Please check your password and try again."
+            );
+          }
+        }
+      }
+
+      window.onload = loadSecrets;
+    </script>
+  </body>
+</html>
