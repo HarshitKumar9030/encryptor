@@ -16,4 +16,4 @@ Secure Vault is a web-based application that allows users to securely encrypt th
 - Encryption: Fernet (symmetric encryption)
 
 ## Author
-- (Harshit)[https://leoncyriac.me]
+- [Harshit](https://leoncyriac.me)
