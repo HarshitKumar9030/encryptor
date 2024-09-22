@@ -70,9 +70,13 @@ def encrypt_file():
 @app.route('/decrypt-file', methods=['POST'])
 def decrypt_file():
     file = request.files['encryptedFile']
-    password = request.form['decryptPassword']
+    secret_id = request.form['decryptSecretSelector']
     
-    key = generate_key(password)
+    secret = Secret.query.get(secret_id)
+    if not secret:
+        return jsonify({"error": "Secret not found"}), 404
+    
+    key = generate_key(secret.encrypted_content[:32].decode())
     f = Fernet(key)
     
     try:

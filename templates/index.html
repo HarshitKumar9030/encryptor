@@ -46,9 +46,7 @@
       </h1>
 
       <div class="bg-white rounded-lg shadow-lg p-8 mb-12">
-        <h2 class="text-2xl font-semibold mb-8 text-orange-700">
-          Add Secret
-        </h2>
+        <h2 class="text-2xl font-semibold mb-8 text-orange-700">Add Secret</h2>
         <form id="encryptTextForm" class="space-y-8">
           <div>
             <label
@@ -189,17 +187,18 @@
           </div>
           <div>
             <label
-              for="decryptPassword"
+              for="decryptSecretSelector"
               class="block text-sm font-medium text-orange-700 mb-2"
-              >Password</label
+              >Select Secret</label
             >
-            <input
-              type="password"
-              id="decryptPassword"
-              name="decryptPassword"
+            <select
+              id="decryptSecretSelector"
+              name="decryptSecretSelector"
               required
-              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 placeholder-orange-300 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
-            />
+              class="w-full px-4 py-3 rounded-md bg-orange-50 border border-orange-200 text-orange-800 focus:border-orange-500 hover:bg-orange-100 transition duration-300"
+            >
+              <option value="">Select a secret</option>
+            </select>
           </div>
           <button
             type="submit"
@@ -224,7 +223,7 @@
           class="container mx-auto px-6 md:px-8 lg:px-12 flex flex-col md:flex-row justify-between items-center"
         >
           <div class="mb-4 md:mb-0">
-            <p>&copy; 2023 Secure Vault. All rights reserved.</p>
+            <p>&copy; 2024 Secure Vault. All rights reserved.</p>
           </div>
           <div>
             <p>
@@ -249,13 +248,20 @@
           const response = await axios.get("/secrets");
           const secretsList = document.getElementById("secretsList");
           const secretSelector = document.getElementById("secretSelector");
+          const decryptSecretSelector = document.getElementById(
+            "decryptSecretSelector"
+          );
 
           secretsList.innerHTML = "";
           secretSelector.innerHTML =
             "<option value=''>Select a secret</option>";
+          decryptSecretSelector.innerHTML =
+            "<option value=''>Select a secret</option>";
 
           if (response.data.length === 0) {
             secretSelector.innerHTML =
+              "<option value=''>No secrets available. Add a secret first.</option>";
+            decryptSecretSelector.innerHTML =
               "<option value=''>No secrets available. Add a secret first.</option>";
             secretsList.innerHTML =
               "<p class='text-orange-600'>No secrets available. Add a secret to get started.</p>";
@@ -265,26 +271,28 @@
               secretElement.className =
                 "flex justify-between items-center bg-orange-100 p-6 rounded-md transition duration-300 hover:bg-orange-200";
               secretElement.innerHTML = `
-                            <span class="font-medium text-orange-800">${
-                              secret.title
-                            } ${secret.is_file ? "(File)" : "(Text)"}</span>
-                            <button onclick="decryptSecret(${secret.id}, '${
+          <span class="font-medium text-orange-800">${secret.title} ${
+                secret.is_file ? "(File)" : "(Text)"
+              }</span>
+          <button onclick="decryptSecret(${secret.id}, '${
                 secret.title
               }')" class="bg-orange-500 text-white px-4 py-2 rounded-md text-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition duration-300 transform hover:scale-105">Decrypt</button>
-                        `;
+        `;
               secretsList.appendChild(secretElement);
 
               const option = document.createElement("option");
               option.value = secret.id;
               option.textContent = secret.title;
               secretSelector.appendChild(option);
+
+              const decryptOption = option.cloneNode(true);
+              decryptSecretSelector.appendChild(decryptOption);
             });
           }
         } catch (error) {
           console.error("Failed to load secrets:", error);
         }
       }
-
       document
         .getElementById("encryptTextForm")
         .addEventListener("submit", async function (e) {
