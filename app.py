@@ -44,7 +44,6 @@ def encrypt_text():
 @app.route('/encrypt-file', methods=['POST'])
 def encrypt_file():
     file = request.files['file']
-    title = request.form['fileTitle']
     secret_id = request.form['secretSelector']
     
     secret = Secret.query.get(secret_id)
@@ -55,10 +54,6 @@ def encrypt_file():
     f = Fernet(key)
     
     encrypted_content = f.encrypt(file.read())
-    
-    new_secret = Secret(title=title, encrypted_content=encrypted_content, is_file=True)
-    db.session.add(new_secret)
-    db.session.commit()
     
     return send_file(
         io.BytesIO(encrypted_content),
